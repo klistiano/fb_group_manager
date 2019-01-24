@@ -62,6 +62,8 @@ class Fbclicker:
             time.sleep(5)
             self.browser.execute_script('window.scrollTo(0,2000)')
             time.sleep(5)
+            post_button = self.browser.find_elements_by_css_selector('._1mf7._4jy0._4jy3._4jy1._51sy.selected._42ft')
+            post_button.click()
 
     def click_invite(self):
         ''' This function finds elements with 'INVITE' button and clicks on each. '''
@@ -89,7 +91,7 @@ def main():
     fb_pass = os.environ.get('FB_PASS')
     fb_mail = os.environ.get('FB_@')
 
-    a = Fbclicker(str(fb_mail), str(fb_pass), '298296040793329')
+    a = Fbclicker('damiannklis@gmail.com'), str(fb_pass), '298296040793329')
     a.sign_in()
     a.scroll_page()
     a.writte_post()
