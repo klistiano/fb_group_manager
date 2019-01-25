@@ -27,7 +27,7 @@ class Fbclicker:
         prefs = {"profile.default_content_setting_values.notifications": 2}
         chrome_options.add_experimental_option("prefs", prefs)
         self.browser = webdriver.Chrome(options=chrome_options,
-                                        executable_path="/path/to/chromedriver")
+                                        executable_path ="/path/to/chromedriver")
 
     def sign_in(self):
         ''' This function allows us to log into Facebook.com.'''
@@ -59,11 +59,21 @@ class Fbclicker:
         if self.check_new_members() == True:
             buttons = self.browser.find_elements_by_css_selector('._42ft._4jy0._4jy3._517h._51sy.mls')
             [button.click() for button in buttons if button.text == 'Write Post']
+            # time.sleep(5)
+            # self.browser.execute_script('window.scrollTo(0,2000)')
+            time.sleep(8)
+            users = self.browser.find_element_by_css_selector('._1mf._1mj')
+            users.send_keys(Keys.ENTER)
             time.sleep(5)
-            self.browser.execute_script('window.scrollTo(0,2000)')
-            time.sleep(5)
-            post_button = self.browser.find_elements_by_css_selector('._1mf7._4jy0._4jy3._4jy1._51sy.selected._42ft')
-            post_button.click()
+            # post_button = self.browser.find_element_by_css_selector('._1mf7._4jy0._4jy3._4jy1._51sy.selected._42ft')
+            # post_button.click()
+
+    def approve_new_users(self):
+        try:
+            self.browser.find_element_by_css_selector('._585r._2i-a._50f4').click()
+            time.sleep(10)
+        except NoSuchElementException as e:
+            print('You have no more requests to approve.')
 
     def click_invite(self):
         ''' This function finds elements with 'INVITE' button and clicks on each. '''
@@ -87,18 +97,19 @@ class Fbclicker:
 
 
 def main():
-    ''' The full process of inviting fans.'''
+    ''' The full process of managing group page.'''
     fb_pass = os.environ.get('FB_PASS')
     fb_mail = os.environ.get('FB_@')
 
-    a = Fbclicker('damiannklis@gmail.com'), str(fb_pass), '298296040793329')
+    a = Fbclicker(str(fb_mail), str(fb_pass), '298296040793329')
     a.sign_in()
     a.scroll_page()
-    a.writte_post()
+    a.approve_new_users()
+    #a.writte_post()
 
     print("You've invited " + str(a.counter) + " people.")
 
-    a.close_browser()
+    #a.close_browser()
 
 if __name__ == '__main__':
     main()
