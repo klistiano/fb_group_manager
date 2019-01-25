@@ -37,7 +37,7 @@ class Fbclicker:
         email_input.send_keys(self.email)
         password_input.send_keys(self.password)
         password_input.send_keys(Keys.ENTER)
-        time.sleep(1)
+        time.sleep(15
 
     def scroll_page(self):
         ''' This function redirects us to group page and scrolls page to invite section. '''
