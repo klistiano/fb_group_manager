@@ -27,7 +27,7 @@ class Fbclicker:
         prefs = {"profile.default_content_setting_values.notifications": 2}
         chrome_options.add_experimental_option("prefs", prefs)
         self.browser = webdriver.Chrome(options=chrome_options,
-                                        executable_path="/path/to/chromedriver")
+                                        executable_path ="/path/to/chromedriver")
 
     def sign_in(self):
         ''' This function allows us to log into Facebook.com.'''
@@ -39,29 +39,34 @@ class Fbclicker:
         password_input.send_keys(Keys.ENTER)
         time.sleep(1)
 
-    def scroll_page(self):
-        ''' This function redirects us to group page and scrolls page to invite section. '''
+    def redirect_to_group(self):
+        ''' This function redirects us to group page and scrolls page to half of the page.'''
         self.browser.get('https://facebook.com/groups/' + self.group_name)
-        self.browser.execute_script('window.scrollTo(0,500)')
+        self.browser.execute_script('window.scrollTo(0,400)')
 
     def check_new_members(self):
+        ''' This function finds section with number of new users and returns TRUE if it more than 40. '''
         try:
             element = self.browser.find_element_by_class_name('_3ip6')
             num_of_members = re.findall('\d+', element.text)
-            if int(num_of_members[0]) > 0:
+            if int(num_of_members[0]) > 40:
                 return True
             else:
                 return False
         except NoSuchElementException as e:
             print('You have les than 30 new members this week.')
 
-    def writte_post(self):
+    def write_post(self):
+        ''' This writes welcome message to new group fans. '''
         if self.check_new_members() == True:
             buttons = self.browser.find_elements_by_css_selector('._42ft._4jy0._4jy3._517h._51sy.mls')
             [button.click() for button in buttons if button.text == 'Write Post']
-            time.sleep(5)
+            time.sleep(3)
             self.browser.execute_script('window.scrollTo(0,2000)')
-            time.sleep(5)
+            time.sleep(3)
+            post_button = self.browser.find_element_by_css_selector('._1mf7._4jy0._4jy3._4jy1._51sy.selected._42ft')
+            time.sleep(3)
+            post_button.click()
 
     def click_invite(self):
         ''' This function finds elements with 'INVITE' button and clicks on each. '''
@@ -76,6 +81,18 @@ class Fbclicker:
         except NoSuchElementException as e:
             print('You have no more people to invite. Try in 1 hour.')
 
+    def approve_new_users(self):
+        try:
+            request_button = self.browser.find_element_by_css_selector('._39g3')
+            request_button.click()
+            submit_button = WebDriverWait(self.browser, 10).until(EC.presence_of_element_located((By.NAME, "approve_all")))
+            submit_button.click()
+            time.sleep(2)
+            confirm_button = self.browser.find_element_by_css_selector('.layerConfirm._4jy0._4jy3._4jy1._51sy.selected._42ft')
+            confirm_button.click()
+            time.sleep(2)
+        except NoSuchElementException as e:
+            print('You have no more requests to approve.')
 
     def close_browser(self):
         self.browser.close()
@@ -85,14 +102,16 @@ class Fbclicker:
 
 
 def main():
-    ''' The full process of inviting fans.'''
+    ''' The full process of managing group page.'''
     fb_pass = os.environ.get('FB_PASS')
     fb_mail = os.environ.get('FB_@')
 
-    a = Fbclicker(str(fb_mail), str(fb_pass), '298296040793329')
+    a = Fbclicker(fb_mail, fb_pass, '298296040793329')
     a.sign_in()
-    a.scroll_page()
-    a.writte_post()
+    a.redirect_to_group()
+    a.click_invite()
+    a.write_post()
+    a.approve_new_users()
 
     print("You've invited " + str(a.counter) + " people.")
 
