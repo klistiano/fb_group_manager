@@ -27,7 +27,7 @@ class Fbclicker:
         prefs = {"profile.default_content_setting_values.notifications": 2}
         chrome_options.add_experimental_option("prefs", prefs)
         self.browser = webdriver.Chrome(options=chrome_options,
-                                        executable_path ="/path/to/chromedriver")
+                                        executable_path="chromedriver")
 
     def sign_in(self):
         ''' This function allows us to log into Facebook.com.'''
@@ -82,8 +82,11 @@ class Fbclicker:
             print('You have no more people to invite. Try in 1 hour.')
 
     def approve_new_users(self):
+        ''' This function finds elements with 'INVITE' button and clicks on each. '''
+        self.browser.execute_script('window.scrollTo(0,100)')
         try:
             request_button = self.browser.find_element_by_css_selector('._39g3')
+            print(request_button.text)
             request_button.click()
             submit_button = WebDriverWait(self.browser, 10).until(EC.presence_of_element_located((By.NAME, "approve_all")))
             submit_button.click()
@@ -109,7 +112,14 @@ def main():
     a = Fbclicker(fb_mail, fb_pass, '298296040793329')
     a.sign_in()
     a.redirect_to_group()
-    a.click_invite()
+
+    try:
+        a.click_invite()
+    except NoSuchElementException as e:
+        print('This person is already your group member.')
+    finally:
+        a.redirect_to_group()
+
     a.write_post()
     a.approve_new_users()
 
