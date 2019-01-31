@@ -31,7 +31,7 @@ class Fbclicker:
         prefs = {"profile.default_content_setting_values.notifications": 2}
         chrome_options.add_experimental_option("prefs", prefs)
         self.browser = webdriver.Chrome(options=chrome_options,
-                                        executable_path="/Users/klistiano/Desktop/py/chromedriver")
+                                        executable_path="path/to/chromedriver")
 
     def sign_in(self):
         '''
@@ -138,7 +138,7 @@ def main():
     fb_pass = os.environ.get('FB_PASS')
     fb_mail = os.environ.get('FB_@')
 
-    a = Fbclicker('damiannklis@gmail.com', fb_pass, '298296040793329')
+    a = Fbclicker(fb_mail, fb_pass, '298296040793329')
     a.sign_in()
     print('Signed in.')
     a.redirect_to_group()
@@ -149,14 +149,13 @@ def main():
         print('This person is already your group member.')
     finally:
         a.redirect_to_group()
-    print('Invited people.')
+    print("You've invited " + str(a.counter) + " people.")
     a.write_post()
     print('Wrote a post.')
     a.approve_new_users()
-    print('Approved new users')
-    print("You've invited " + str(a.counter) + " people.")
-
+    print('Approved new users.')
     a.close_browser()
+    print('Closed browser.')
 
 if __name__ == '__main__':
     main()
