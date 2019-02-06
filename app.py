@@ -5,6 +5,8 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import NoSuchElementException
+from selenium.common.exceptions import StaleElementReferenceException
+from selenium.common.exceptions import WebDriverException
 import time
 import os
 import re
@@ -31,7 +33,7 @@ class Fbclicker:
         prefs = {"profile.default_content_setting_values.notifications": 2}
         chrome_options.add_experimental_option("prefs", prefs)
         self.browser = webdriver.Chrome(options=chrome_options,
-                                        executable_path="path/to/chromedriver")
+                                        executable_path="/path/to/chromedriver")
 
     def sign_in(self):
         '''
@@ -83,6 +85,8 @@ class Fbclicker:
             post_button = self.browser.find_element_by_css_selector('._1mf7._4jy0._4jy3._4jy1._51sy.selected._42ft')
             time.sleep(3)
             post_button.click()
+        else:
+            self.check_new_members()
 
     def click_invite(self):
         '''
@@ -145,15 +149,17 @@ def main():
     print('Redirected to group page.')
     try:
         a.click_invite()
-    except NoSuchElementException as e:
+    except StaleElementReferenceException as e:
         print('This person is already your group member.')
     finally:
         a.redirect_to_group()
     print("You've invited " + str(a.counter) + " people.")
-    a.write_post()
-    print('Wrote a post.')
-    a.approve_new_users()
-    print('Approved new users.')
+    #a.write_post()
+    try:
+        a.approve_new_users()
+        print('Approved new users.')
+    except WebDriverException as e:
+        print('Comeback in hour.')
     a.close_browser()
     print('Closed browser.')
 
